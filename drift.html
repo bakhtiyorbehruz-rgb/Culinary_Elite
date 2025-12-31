@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Culinary Elite Luxe | 2025</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --accent:#E2B270;
+  --bg:#050505;
+  --glass:rgba(255,255,255,.05);
+  --border:rgba(226,178,112,.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif}
+body{background:var(--bg);color:#fff}
+
+/* HEADER */
+header{text-align:center;padding:40px 20px}
+header h1{font-family:'Playfair Display';font-size:46px;color:var(--accent)}
+
+/* NAV */
+.navigation{
+  position:sticky;top:0;
+  background:rgba(0,0,0,.9);
+  backdrop-filter:blur(10px);
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  z-index:1000;
+}
+.tab-btn{
+  padding:8px 18px;
+  border-radius:50px;
+  border:1px solid var(--border);
+  background:var(--glass);
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+.tab-btn.active{background:var(--accent);color:#000}
+.search-input{
+  width:100%;max-width:360px;
+  padding:10px 18px;
+  border-radius:50px;
+  background:#111;
+  border:1px solid var(--border);
+  color:#fff;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:22px;
+  padding:30px;
+  max-width:1200px;
+  margin:auto;
+}
+.card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:26px;
+  padding:26px;
+  text-align:center;
+  cursor:pointer;
+  animation:fadeUp .5s ease forwards;
+  opacity:0;
+}
+.card:hover{transform:translateY(-8px);border-color:var(--accent)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px)}to{opacity:1}}
+.card .emoji{font-size:46px;margin-bottom:10px}
+.card h3{font-family:'Playfair Display';font-size:22px}
+
+/* MODAL */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.95);
+  display:none;
+  padding:20px;
+  overflow-y:auto;
+  z-index:9999;
+}
+.modal-content{max-width:600px;margin:auto}
+.close{
+  position:fixed;top:15px;right:20px;
+  font-size:36px;color:var(--accent);
+  cursor:pointer;
+}
+.recipe-box{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  margin-top:15px;
+}
+.recipe-box h2{color:var(--accent);margin-bottom:6px}
+.recipe-box p{line-height:1.6}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Culinary Elite</h1>
+</header>
+
+<div class="navigation">
+  <div>
+    <button class="tab-btn active" onclick="setCat('Все',this)">Все</button>
+    <button class="tab-btn" onclick="setCat('Завтрак',this)">Завтрак</button>
+    <button class="tab-btn" onclick="setCat('Обед',this)">Обед</button>
+    <button class="tab-btn" onclick="setCat('Ужин',this)">Ужин</button>
+  </div>
+  <div>
+    <button onclick="setLang('ru')">RU</button> |
+    <button onclick="setLang('tj')">TJ</button> |
+    <button onclick="setLang('en')">EN</button>
+  </div>
+  <input id="search" class="search-input" placeholder="Поиск..." oninput="render()">
+</div>
+
+<div class="grid" id="recipe-grid"></div>
+
+<div class="modal" id="modal" onclick="closeM()">
+  <span class="close">×</span>
+  <div class="modal-content" id="modal-body" onclick="event.stopPropagation()"></div>
+</div>
+
+<script>
+let lang='ru', currentCat='Все';
+
+const ui={
+  ing:{ru:"Ингредиенты",tj:"Маҳсулот",en:"Ingredients"},
+  step:{ru:"Приготовление",tj:"Тарзи омода кардан",en:"Preparation"}
+};
+
+const db=[
+/* ЗАВТРАК (7) */
+{cat:"Завтрак",emoji:"🍳",title:{ru:"Омлет",tj:"Омлет",en:"Omelette"},ing:{ru:"Яйца, молоко",tj:"Тухм, шир",en:"Eggs, milk"},step:{ru:"Жарьте под крышкой.",tj:"Пазед.",en:"Fry."}},
+{cat:"Завтрак",emoji:"🥞",title:{ru:"Блины",tj:"Қатлама",en:"Pancakes"},ing:{ru:"Мука, молоко",tj:"Орд, шир",en:"Flour, milk"},step:{ru:"Обжарьте.",tj:"Бирён кунед.",en:"Fry."}},
+{cat:"Завтрак",emoji:"🥣",title:{ru:"Овсянка",tj:"Ширбиринҷ",en:"Oatmeal"},ing:{ru:"Овсянка, мед",tj:"Геркулес, асал",en:"Oats, honey"},step:{ru:"Варите 5 минут.",tj:"5 дақиқа.",en:"Boil 5 min."}},
+{cat:"Завтрак",emoji:"🥑",title:{ru:"Авокадо тост",tj:"Тост бо авокадо",en:"Avocado Toast"},ing:{ru:"Хлеб, авокадо",tj:"Нон, авокадо",en:"Bread, avocado"},step:{ru:"Намажьте.",tj:"Молед.",en:"Spread."}},
+{cat:"Завтрак",emoji:"🧀",title:{ru:"Сырники",tj:"Сырникҳо",en:"Syrniki"},ing:{ru:"Творог, мука",tj:"Творог, орд",en:"Cheese, flour"},step:{ru:"Обжарьте.",tj:"Бирён кунед.",en:"Fry."}},
+{cat:"Завтрак",emoji:"🥐",title:{ru:"Круассан",tj:"Круассан",en:"Croissant"},ing:{ru:"Тесто, масло",tj:"Хамир, равған",en:"Dough, butter"},step:{ru:"Запеките.",tj:"Пазед.",en:"Bake."}},
+{cat:"Завтрак",emoji:"🍓",title:{ru:"Йогурт с фруктами",tj:"Йогурт бо мева",en:"Yogurt & Fruit"},ing:{ru:"Йогурт, фрукты",tj:"Йогурт, мева",en:"Yogurt, fruits"},step:{ru:"Смешайте.",tj:"Омехта.",en:"Mix."}},
+
+/* ОБЕД (7) */
+{cat:"Обед",emoji:"🍖",title:{ru:"Плов",tj:"Оши палов",en:"Pilaf"},ing:{ru:"Рис, мясо",tj:"Биринҷ, гӯшт",en:"Rice, meat"},step:{ru:"Тушите.",tj:"Пазед.",en:"Cook."}},
+{cat:"Обед",emoji:"🍲",title:{ru:"Борщ",tj:"Борщ",en:"Borsch"},ing:{ru:"Свекла, мясо",tj:"Лаблабу, гӯшт",en:"Beet, meat"},step:{ru:"Варите.",tj:"Пазед.",en:"Boil."}},
+{cat:"Обед",emoji:"🍝",title:{ru:"Паста",tj:"Паста",en:"Pasta"},ing:{ru:"Макароны, соус",tj:"Макарон, соус",en:"Pasta, sauce"},step:{ru:"Смешайте.",tj:"Омехта.",en:"Mix."}},
+{cat:"Обед",emoji:"🥟",title:{ru:"Манты",tj:"Манту",en:"Manti"},ing:{ru:"Мясо, тесто",tj:"Гӯшт, хамир",en:"Meat, dough"},step:{ru:"Готовьте на пару.",tj:"Дар буғ.",en:"Steam."}},
+{cat:"Обед",emoji:"🥘",title:{ru:"Лазанья",tj:"Лазанья",en:"Lasagna"},ing:{ru:"Фарш, сыр",tj:"Қима, панир",en:"Meat, cheese"},step:{ru:"Запеките.",tj:"Пазед.",en:"Bake."}},
+{cat:"Обед",emoji:"🥗",title:{ru:"Цезарь",tj:"Салати Цезар",en:"Caesar Salad"},ing:{ru:"Курица, салат",tj:"Мурғ, салат",en:"Chicken, salad"},step:{ru:"Смешайте.",tj:"Омехта.",en:"Mix."}},
+{cat:"Обед",emoji:"🍛",title:{ru:"Карри",tj:"Карри",en:"Curry"},ing:{ru:"Курица, специи",tj:"Мурғ, зиравор",en:"Chicken, spices"},step:{ru:"Тушите.",tj:"Пазед.",en:"Stew."}},
+
+/* УЖИН (7) */
+{cat:"Ужин",emoji:"🥩",title:{ru:"Стейк",tj:"Стейк",en:"Steak"},ing:{ru:"Говядина",tj:"Гӯшти гов",en:"Beef"},step:{ru:"Жарьте.",tj:"Бирён.",en:"Fry."}},
+{cat:"Ужин",emoji:"🍕",title:{ru:"Пицца",tj:"Питса",en:"Pizza"},ing:{ru:"Тесто, сыр",tj:"Хамир, панир",en:"Dough, cheese"},step:{ru:"Запеките.",tj:"Пазед.",en:"Bake."}},
+{cat:"Ужин",emoji:"🍣",title:{ru:"Суши",tj:"Суши",en:"Sushi"},ing:{ru:"Рис, рыба",tj:"Биринҷ, моҳӣ",en:"Rice, fish"},step:{ru:"Скрутите.",tj:"Печонед.",en:"Roll."}},
+{cat:"Ужин",emoji:"🐟",title:{ru:"Лосось",tj:"Лосос",en:"Salmon"},ing:{ru:"Рыба, лимон",tj:"Моҳӣ, лиму",en:"Fish, lemon"},step:{ru:"Запеките.",tj:"Пазед.",en:"Bake."}},
+{cat:"Ужин",emoji:"🍢",title:{ru:"Шашлык",tj:"Кабоб",en:"Kebab"},ing:{ru:"Мясо, лук",tj:"Гӯшт, пиёз",en:"Meat, onion"},step:{ru:"Жарьте.",tj:"Бирён.",en:"Grill."}},
+{cat:"Ужин",emoji:"🦐",title:{ru:"Креветки",tj:"Креветка",en:"Shrimps"},ing:{ru:"Креветки, чеснок",tj:"Креветка, сирпиёз",en:"Shrimp, garlic"},step:{ru:"Обжарьте.",tj:"Бирён.",en:"Fry."}},
+{cat:"Ужин",emoji:"🍆",title:{ru:"Рататуй",tj:"Рататуй",en:"Ratatouille"},ing:{ru:"Овощи",tj:"Сабзавот",en:"Vegetables"},step:{ru:"Запеките.",tj:"Пазед.",en:"Bake."}}
+];
+
+function setLang(l){lang=l;render()}
+function setCat(c,b){
+  currentCat=c;
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  render();
+}
+
+function render(){
+  const grid=document.getElementById('recipe-grid');
+  const q=document.getElementById('search').value.toLowerCase();
+  grid.innerHTML='';
+  db.filter(i=>(currentCat==='Все'||i.cat===currentCat)&&i.title[lang].toLowerCase().includes(q))
+  .forEach(i=>{
+    const d=document.createElement('div');
+    d.className='card';
+    d.onclick=()=>openM(i);
+    d.innerHTML=`
+      <div class="emoji">${i.emoji}</div>
+      <h3>${i.title[lang]}</h3>
+      <p style="color:var(--accent);font-size:12px">${i.cat}</p>`;
+    grid.appendChild(d);
+  });
+}
+
+function openM(i){
+  modal.style.display='block';
+  modalBody.innerHTML=`
+    <div style="text-align:center">
+      <div style="font-size:80px">${i.emoji}</div>
+      <h1 style="color:var(--accent)">${i.title[lang]}</h1>
+    </div>
+    <div class="recipe-box"><h2>${ui.ing[lang]}</h2><p>${i.ing[lang]}</p></div>
+    <div class="recipe-box"><h2>${ui.step[lang]}</h2><p>${i.step[lang]}</p></div>`;
+}
+function closeM(){modal.style.display='none'}
+document.addEventListener('keydown',e=>e.key==="Escape"&&closeM());
+
+const modal=document.getElementById('modal');
+const modalBody=document.getElementById('modal-body');
+
+render();
+</script>
+
+</body>
+</html>
